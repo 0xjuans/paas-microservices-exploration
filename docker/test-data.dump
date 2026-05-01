@@ -1,0 +1,54 @@
+--
+-- PostgreSQL: datos de prueba (SQL plano, extensión .dump).
+-- Ejecutar cuando ya existan las tablas en cada base (primero catalog-service y order-service al menos una vez).
+--
+-- Desde PowerShell en la raíz del repo:
+--   docker compose exec -T postgres psql -U postgres -v ON_ERROR_STOP=1 -f /dev/stdin < docker/test-data.dump
+--
+-- Nota PowerShell puede no interpretar bien el redirect; alternativa dentro del contenedor:
+--   docker compose cp docker/test-data.dump postgres:/tmp/test-data.dump
+--   docker compose exec postgres psql -U postgres -v ON_ERROR_STOP=1 -f /tmp/test-data.dump
+--
+
+\connect catalog
+
+TRUNCATE TABLE products RESTART IDENTITY CASCADE;
+
+INSERT INTO products (id, name, price) VALUES
+  (1,  'Portátil entrada',           3599000),
+  (2,  'Mouse inalámbrico',            89900),
+  (3,  'Monitor 24 pulgadas',         849000),
+  (4,  'Teclado mecánico',            419000),
+  (5,  'Audífonos over-ear',         279500),
+  (6,  'Webcam USB',                   99000),
+  (7,  'Micrófono cardioide',       189000),
+  (8,  'SSD 1TB NVMe',               579000),
+  (9,  'Memoria RAM 16 GB DDR5',      629000),
+  (10, 'Hub USB-C',                    75900);
+
+SELECT setval(
+  pg_get_serial_sequence('products', 'id'),
+  COALESCE((SELECT MAX(id) FROM products), 1)
+);
+
+
+\connect orders
+
+TRUNCATE TABLE purchase_orders RESTART IDENTITY CASCADE;
+
+INSERT INTO purchase_orders (product_id, quantity, created_at) VALUES
+  (1,  1, NOW() AT TIME ZONE 'UTC' - INTERVAL '9 hours'),
+  (2,  2, NOW() AT TIME ZONE 'UTC' - INTERVAL '8 hours'),
+  (3,  1, NOW() AT TIME ZONE 'UTC' - INTERVAL '7 hours'),
+  (4,  3, NOW() AT TIME ZONE 'UTC' - INTERVAL '6 hours'),
+  (5,  1, NOW() AT TIME ZONE 'UTC' - INTERVAL '5 hours'),
+  (6,  4, NOW() AT TIME ZONE 'UTC' - INTERVAL '4 hours'),
+  (7,  2, NOW() AT TIME ZONE 'UTC' - INTERVAL '3 hours'),
+  (8,  1, NOW() AT TIME ZONE 'UTC' - INTERVAL '2 hours'),
+  (9,  2, NOW() AT TIME ZONE 'UTC' - INTERVAL '1 hour'),
+  (10, 1, NOW() AT TIME ZONE 'UTC' - INTERVAL '30 minutes');
+
+SELECT setval(
+  pg_get_serial_sequence('purchase_orders', 'id'),
+  COALESCE((SELECT MAX(id) FROM purchase_orders), 1)
+);

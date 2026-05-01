@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: Order Service API (Node.js)
+  description: |
+    Pedidos en PostgreSQL. Antes de guardar valida que el producto exista llamando por HTTP a **catalog-service** (Spring Boot).
+  version: "1.0"
+servers:
+  - url: http://localhost:8082
+tags:
+  - name: Pedidos
+    description: Gestión de pedidos
+paths:
+  /api/orders:
+    get:
+      tags: [Pedidos]
+      summary: Listar pedidos
+      responses:
+        "200":
+          description: Lista de pedidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PurchaseOrder"
+    post:
+      tags: [Pedidos]
+      summary: Crear pedido
+      description: Verifica por HTTP que el producto exista en catalog-service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Pedido creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrder"
+        "400":
+          description: Datos inválidos o producto inexistente en el catálogo
+        "502":
+          description: No se pudo contactar al catálogo
+  /health:
+    get:
+      summary: Salud del servicio
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: integer
+          minimum: 1
+          description: ID del producto en catalog-service
+        quantity:
+          type: integer
+          minimum: 1
+    PurchaseOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador del pedido (BigInt serializado como string)
+        productId:
+          type: string
+        quantity:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
