@@ -21,6 +21,10 @@ const port = Number(process.env.PORT ?? 8082);
 
 app.use(express.json());
 
+app.get("/", (_req, res) => {
+  res.json({ service: "order-service", status: "ok" });
+});
+
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "order-service-node" });
 });
