@@ -4,8 +4,6 @@ info:
   description: |
     Pedidos en PostgreSQL. Antes de guardar valida que el producto exista llamando por HTTP a **catalog-service** (Spring Boot).
   version: "1.0"
-servers:
-  - url: http://localhost:8082
 tags:
   - name: Pedidos
     description: Gestión de pedidos
