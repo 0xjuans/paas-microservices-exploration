@@ -1,14 +1,15 @@
 package com.paas.catalog.web;
 
-import org.springframework.stereotype.Controller;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/** Redirige la raíz del servicio hacia la documentación interactiva. */
-@Controller
+/** Endpoint raíz con estado básico del servicio. */
+@RestController
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
-        return "redirect:/swagger-ui.html";
+    public Map<String, String> home() {
+        return Map.of("service", "catalog-service", "status", "ok");
     }
 }
